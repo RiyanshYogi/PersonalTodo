@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background: rgb(2, 0, 36);
+      background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(185, 185, 203, 1) 55%, rgba(5, 57, 68, 1) 89%);
+    }
+
+    h1,
+    p,
+    form,
+    section,
+    h3 {
+      text-align: center;
+    }
+
+    p {
+      font-size: large;
+    }
+
+    input {
+      font-size: large;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Personal use TODO list</h1>
+  <p>Just click to mark it as completed, re-click if accidently marked to get it back to normal</p>
+  <p>Double click to delete the task</p>
+
+  <form>
+    <input type="text" id="inputValue"> <br>
+    <button id="addBtn">add item</button>
+
+  </form>
+
+  <section id="container">
+
+  </section>
+
+  <script>
+    const inputValue = document.getElementById('inputValue');
+    const addBtn = document.getElementById('addBtn')
+    const container = document.getElementById('container');
+
+    let myarr = JSON.parse(localStorage.getItem('ourslocal')) || [];
+
+
+    const addItem = () => {
+
+      container.innerHTML = ""
+
+      myarr.forEach((curr, index) => {
+        const h2 = document.createElement('h2');
+        h2.innerText = curr.text;
+        h2.style.textDecoration = curr.completed ? 'line-through' : 'none';
+        container.appendChild(h2);
+        h2.dataset.index = index;
+      })
+
+    }
+
+    addItem(); // initial rendering , bsdk
+
+    addBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      let val = inputValue.value.trim();
+      if (!myarr.some(item => item.text === val) && val) {
+        myarr.push({ text: val, completed: false });
+        localStorage.setItem('ourslocal', JSON.stringify(myarr));
+        addItem();
+      }
+      inputValue.value = "";
+    })
+
+    container.addEventListener('dblclick', (e) => {
+      if (e.target.tagName === 'H2') {
+        let index = e.target.dataset.index;
+        myarr.splice(index, 1);
+        localStorage.setItem('ourslocal', JSON.stringify(myarr))
+        e.target.remove();
+        addItem();
+      }
+    })
+
+    container.addEventListener('click', (e) => {
+      if (e.target.tagName === 'H2') {
+        let index = e.target.dataset.index;
+        myarr[index].completed = !myarr[index].completed;
+        e.target.style.textDecoration = myarr[index].completed ? 'line-through' : 'none'
+        localStorage.setItem('ourslocal', JSON.stringify(myarr))
+        //addItem();
+      }
+    })
+
+
+  </script>
+
+</body>
+
+</html>
